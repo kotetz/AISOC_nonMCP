@@ -11,7 +11,7 @@ context: fork
 
 ## 手順
 
-1. Sentinel内の脅威インテリジェンスと突合する。IOCの種別に応じた列でその場でKQLを組み立てて`aisoc query`で実行する:
+1. Sentinel内の脅威インテリジェンスと突合する。IOCの種別に応じた列でその場でKQLを組み立てて実行する:
 
    ```
    ThreatIntelIndicators

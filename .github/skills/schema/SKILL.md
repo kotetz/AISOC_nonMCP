@@ -50,4 +50,4 @@ user-invocable: false
 ## 使い方の指針
 
 - テーブル名だけでなく実際の列名は変わりうるため、初めて使うテーブルは `<TableName> | take 1` または `<TableName> | getschema` で確認してから本クエリを組み立てる。
-- `dynamic`型の列(`Entities`, `AlertIds`, `Labels`等)は`aisoc`のPythonクライアント側でJSONとしてパース済みで返る。`aisoc query`で生のKQL結果を直接見る場合はJSON文字列のまま返ることがある点に注意する。
+- `dynamic`型の列(`Entities`, `AlertIds`, `Labels`等)は `Invoke-AzOperationalInsightsQuery` の結果ではJSON文字列として返る。KQL側で`mv-expand`/`parse_json`を使って展開・集計するのが簡単な場合が多い。

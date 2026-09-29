@@ -9,10 +9,10 @@ context: fork
 
 ## 手順
 
-1. 現在オープンなインシデントを取得する:
+1. 現在オープンなインシデントを取得する(severityランクとアラート数はKQL側で計算してソート):
 
    ```powershell
-   aisoc triage --hours 720 --severity High,Medium
+   Invoke-AzOperationalInsightsQuery -WorkspaceId $env:AISOC_WORKSPACE_ID -Timespan (New-TimeSpan -Days 30) -Query "SecurityIncident | summarize arg_max(TimeGenerated, *) by IncidentNumber | where Status in ('New', 'Active') | where Severity in ('High', 'Medium') | extend SeverityRank = case(Severity == 'High', 3, Severity == 'Medium', 2, Severity == 'Low', 1, 0), AlertCount = array_length(AlertIds) | order by SeverityRank desc, AlertCount desc"
    ```
 
    期間やseverityフィルタはメッセージの指示に応じて調整する。指定がなければ既定値(過去30日、全severity)を使う。

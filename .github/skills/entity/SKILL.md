@@ -19,7 +19,7 @@ context: fork
 3. 専門Skillの所見をもとに、このエンティティが関わる既存のアラート/インシデントがないか確認する:
 
    ```powershell
-   aisoc query "SecurityAlert | where Entities has '<value>' | project TimeGenerated, AlertName, AlertSeverity | order by TimeGenerated desc" --hours 168
+   Invoke-AzOperationalInsightsQuery -WorkspaceId $env:AISOC_WORKSPACE_ID -Timespan (New-TimeSpan -Hours 168) -Query "SecurityAlert | where Entities has '<value>' | project TimeGenerated, AlertName, AlertSeverity | order by TimeGenerated desc"
    ```
 
    関連するインシデントが見つかった場合は `incident` Skillでの深掘りを提案する。

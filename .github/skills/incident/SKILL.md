@@ -14,12 +14,24 @@ context: fork
 1. **概況把握**(このSkill自身が行う一般的なパート)
 
    ```powershell
-   aisoc incident get <number>
-   aisoc incident alerts <number>
-   aisoc incident entities <number>
+   # インシデント本体
+   Invoke-AzOperationalInsightsQuery -WorkspaceId $env:AISOC_WORKSPACE_ID -Timespan (New-TimeSpan -Days 365) -Query "SecurityIncident | where IncidentNumber == <number> | order by TimeGenerated desc | take 1"
    ```
 
-   タイトル・重大度・ステータス・関連アラート数・エンティティの内訳(Account/Host/IP/URL/FileHash等)を把握する。
+   結果の `AlertIds`(dynamic配列)を使って関連アラートを取得する:
+
+   ```powershell
+   # 関連アラート + エンティティ種別ごとの集計(mv-expandでKQL側で展開する)
+   Invoke-AzOperationalInsightsQuery -WorkspaceId $env:AISOC_WORKSPACE_ID -Timespan (New-TimeSpan -Days 365) -Query "SecurityAlert | where SystemAlertId in (<AlertIdsをカンマ区切りで>) | project TimeGenerated, AlertName, AlertSeverity, Tactics, ProductName, Entities | order by TimeGenerated desc"
+   ```
+
+   エンティティの内訳(Account/Host/IP/URL/FileHash等)は、上記結果の`Entities`列(JSON文字列)を`mv-expand`+`parse_json`でKQL側で展開・集計すると楽:
+
+   ```
+   SecurityAlert | where SystemAlertId in (<AlertIds>) | mv-expand e = parse_json(Entities) | summarize Values=make_set(coalesce(tostring(e.Name), tostring(e.HostName), tostring(e.Address), tostring(e.Url), tostring(e.FileName))) by EntityType = tostring(e.Type)
+   ```
+
+   タイトル・重大度・ステータス・関連アラート数・エンティティの内訳を把握する。
 
 2. **専門Skillへの自動委譲**(深掘りパート。該当するものだけ呼ぶ)
 
@@ -30,10 +42,10 @@ context: fork
 
 3. **横展開の確認**
 
-   専門Skillの所見から得られたエンティティ値を使い、同じエンティティが他のインシデントにも登場していないか `aisoc query` でその場でKQLを組み立てて確認する。例:
+   専門Skillの所見から得られたエンティティ値を使い、同じエンティティが他のインシデントにも登場していないか、その場でKQLを組み立てて確認する。例:
 
-   ```
-   SecurityAlert | where Entities has "<value>" | project TimeGenerated, AlertName, AlertSeverity, SystemAlertId | order by TimeGenerated desc
+   ```powershell
+   Invoke-AzOperationalInsightsQuery -WorkspaceId $env:AISOC_WORKSPACE_ID -Timespan (New-TimeSpan -Hours 168) -Query "SecurityAlert | where Entities has '<value>' | project TimeGenerated, AlertName, AlertSeverity, SystemAlertId | order by TimeGenerated desc"
    ```
 
 4. **記録**
@@ -49,4 +61,3 @@ context: fork
 - 書き込み系操作(コメント追加・ステータス変更・クローズ等)は一切行わない。
 - クエリ結果が空の場合は「データなし」と正直に報告し、憶測で断定しない。
 - テーブルの列がわからない場合は `schema` Skillの内容を参照する。
-- すべての `aisoc` コマンドはリポジトリルートで `pip install -e .` 済みであることを前提とする。

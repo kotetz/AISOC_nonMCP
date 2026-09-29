@@ -7,7 +7,7 @@ context: fork
 
 # デバイス/エンドポイント軸の調査
 
-対象デバイスについて、以下の観点を確認する。クエリは `aisoc query "<KQL>" --hours <N>` でその都度組み立てる。テーブルの列がわからない場合は `schema` Skillの内容を参照する。
+対象デバイスについて、以下の観点を確認する。クエリは `Invoke-AzOperationalInsightsQuery -WorkspaceId $env:AISOC_WORKSPACE_ID -Timespan (New-TimeSpan -Hours <N>) -Query "<KQL>"` でその都度組み立てる。テーブルの列がわからない場合は `schema` Skillの内容を参照する。
 
 ## 着眼点
 

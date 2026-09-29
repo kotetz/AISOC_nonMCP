@@ -7,7 +7,7 @@ context: fork
 
 # ユーザー/ID軸の調査
 
-対象アカウントについて、以下の観点を確認する。クエリは `aisoc query "<KQL>" --hours <N>` でその都度組み立てる(固定テンプレートは使わない)。テーブルの列がわからない場合は `schema` Skillの内容を参照する。調査期間の既定・拡大条件は [copilot-instructions.md](../../copilot-instructions.md) の共通ガードレールに従う。
+対象アカウントについて、以下の観点を確認する。クエリは `Invoke-AzOperationalInsightsQuery -WorkspaceId $env:AISOC_WORKSPACE_ID -Timespan (New-TimeSpan -Hours <N>) -Query "<KQL>"` でその都度組み立てる(固定テンプレートは使わない)。テーブルの列がわからない場合は `schema` Skillの内容を参照する。調査期間の既定・拡大条件は [copilot-instructions.md](../../copilot-instructions.md) の共通ガードレールに従う。
 
 ## 着眼点
 
