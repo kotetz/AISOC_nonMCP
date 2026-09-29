@@ -1,6 +1,6 @@
 # Local secrets / environment
 .env
 
-# Investigation case records may contain tenant-sensitive data; do not commit.
-cases/*/
-!cases/.gitkeep
+# Investigation reports may contain tenant-sensitive data; do not commit.
+Reports/*
+!Reports/.gitkeep
