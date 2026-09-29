@@ -73,6 +73,7 @@ Skillは自然文からも自動的に選ばれます(例:「インシデント#
     ├── device/SKILL.md
     ├── ti/SKILL.md
     └── schema/SKILL.md
-assets/d3.v7.min.js            # レポート用に同梱したD3.js(オフライン閲覧用)
 cases/                         # 調査ごとの記録(gitignore済み)
 ```
+
+D3.jsはレポートHTML内でCDNから読み込みます(HTMLファイル単体で受け渡しできるようにするため)。`assets/d3.v7.min.js` は旧方式(ローカル同梱)で生成した過去レポートの互換用に残置しています。

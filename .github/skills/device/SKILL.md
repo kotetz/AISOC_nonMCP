@@ -30,5 +30,4 @@ context: fork
 
 ## 注意事項
 
-- 書き込み系操作(デバイスの隔離・プロセスの強制終了等)は一切行わない。提案に留める。
-- データが存在しない場合は「データなし」と正直に報告する。このワークスペースには `DeviceCustom*`(`DeviceCustomProcessEvents`等)という標準MDEスキーマにない独自テーブルも存在するため、通常の`Device*`テーブルにデータがなくても`DeviceCustom*`系を確認する。
+- このワークスペースには `DeviceCustom*`(`DeviceCustomProcessEvents`等)という標準MDEスキーマにない独自テーブルも存在するため、通常の`Device*`テーブルにデータがなくても`DeviceCustom*`系を確認する。

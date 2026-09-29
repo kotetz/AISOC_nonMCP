@@ -47,6 +47,20 @@ user-invocable: false
 - `IntuneAuditLogs`, `IntuneDevices`, `IntuneDeviceComplianceOrg`
 - `*_KQL_CL` という命名の複数のカスタムテーブル(例: `PasswordSprayIPs_KQL_CL`, `Signinlogs_Anomalies_KQL_CL`, `UserAppSigninLocationDailyBaseline_KQL_CL`)は演習/デモ用に事前計算された派生テーブルの可能性が高い。関連しそうな調査の際は存在を確認する価値がある。
 
+## 過去の調査で判明済みの注意点(列の全量列挙はしない、要点のみ)
+
+以下のテーブルは既に複数回のユーザー/ID軸調査で使用済み。**ユーザーを特定する列名がテーブルごとに異なる**点が最大のハマりどころなので、そこだけ明記する。それ以外の列が必要な場合は都度 `getschema` で確認すること(このリストは`getschema`を代替するものではない)。
+
+- `SigninLogs`: ユーザー列は `UserPrincipalName`。`RiskLevelAggregated`/`RiskState`/`RiskDetail`/`IsRisky`などリスク列あり。
+- `AADNonInteractiveUserSignInLogs`: ユーザー列は `UserPrincipalName`。ただし `SigninLogs` と違い `RiskLevelAggregated`/`RiskState`/`RiskDetail` は**存在しない**(参照するとBadRequestになった実績あり)。
+- `AuditLogs`: 実行者は `InitiatedBy.user.userPrincipalName`、対象は `TargetResources`(dynamic配列)の `userPrincipalName`。`TargetResources[].modifiedProperties` はさらにネストしたdynamic配列で、`mv-expand`を二重にかけると失敗しやすい(実績あり)。`tostring(...)` して `has` で粗く絞る方が安定。
+- `IdentityDirectoryEvents`(Defender for Identity): ユーザー列は `AccountUpn`/`AccountName`(対象側は `TargetAccountUpn`)。詳細は `AdditionalFields`(dynamic)。JSON抽出は `extractjson()` ではなく `parse_json()`/`todynamic()` を使う(`extractjson`は存在しない関数名でBadRequestになった実績あり)。
+- `BehaviorAnalytics`: ユーザー列は `UserName`/`UserPrincipalName`(行為者 `ActorName`系、対象 `TargetName`系)。`column_ifexists`を多数並べた巨大な`extend`は失敗しやすい(実績あり)。基本列だけでまず絞り込んでから詳細列を足す方が安定。
+- `AADUserRiskEvents` / `AADRiskyUsers`: ユーザー列は共通で `UserPrincipalName`。
+- `IdentityInfo`: ユーザー列は `AccountUPN`/`AccountName`。`RiskLevel`/`RiskState`/`InvestigationPriority`/`AssignedRoles`などアカウント状態の列が豊富。
+- `DeviceLogonEvents`: ユーザー列は `AccountName`(UPNで絞るなら `InitiatingProcessAccountUpn`)。
+- `AWSCloudTrail`: ユーザー列は `UserIdentityUserName`/`SessionIssuerUserName`(ARNに名前が含まれる場合は `UserIdentityArn`/`SessionIssuerArn`)。
+
 ## 使い方の指針
 
 - テーブル名だけでなく実際の列名は変わりうるため、初めて使うテーブルは `<TableName> | take 1` または `<TableName> | getschema` で確認してから本クエリを組み立てる。
