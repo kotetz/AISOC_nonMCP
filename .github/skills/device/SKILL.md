@@ -7,7 +7,7 @@ context: fork
 
 # デバイス/エンドポイント軸の調査
 
-対象デバイスについて、以下の観点を確認する。クエリは `Invoke-AzOperationalInsightsQuery -WorkspaceId $env:AISOC_WORKSPACE_ID -Timespan (New-TimeSpan -Hours <N>) -Query "<KQL>"` でその都度組み立てる。テーブルの列がわからない場合は `schema` Skillの内容を参照する。
+対象デバイスについて、以下の観点を確認する。クエリは `Invoke-AzOperationalInsightsQuery -WorkspaceId $env:AISOC_WORKSPACE_ID -Timespan (New-TimeSpan -Hours <N>) -Query "<KQL>"` でその都度組み立てる。使用するテーブルが決まったら、`../schema/references/<TableName>.md` の共通スキーマを直接読む。複数テーブルを使う場合は必要なファイルだけを並列に読み、Currentのリファレンスがあるテーブルへ通常調査で`getschema`を実行しない。環境不一致・ファイル欠落・列エラー時は `schema` Skillの初期化・更新手順に従う。
 
 ## 着眼点
 

@@ -23,7 +23,7 @@
 
 調査結果は **単一のHTMLファイル** として `Reports/` 直下にフラットに出力します。調査単位のサブディレクトリやローカルアセットは作成しません。すべてのSkill(`incident`, `triage`, `entity`)に共通の仕様です。固定のレンダリングスクリプト/テンプレートエンジンは用意していません。調査ごとに内容も見せ方も変わるため、都度この仕様に沿ってHTMLを直接組み立てます。
 
-- **ファイル名**: `yyyy_mm_dd_<識別子>_<調査の特徴を表す短い説明>.html`。日付は調査日、識別子と説明は英数字・ハイフン区切りとし、パス区切り文字などファイル名に使えない文字はハイフンへ置換する。識別子は必須で、インシデント調査は `incident-<番号>`(例: `2026_09_29_incident-123_domain-controller-persistence.html`)、エンティティ調査は `<種別>-<値>`(例: `2026_09_29_user-alice-contoso-com_suspicious-signins.html`)、値のない横断ハントは `hunt-<対象>`(例: `2026_09_29_hunt-users_risky-user-review.html`)を使用する。
+- **ファイル名**: `yyyy_MM_dd_hhmmss_<識別子>_<調査の特徴を表す短い説明>.html`。日時はレポート生成時のローカル時刻を24時間表記で使用し、識別子と説明は英数字・ハイフン区切りとする。パス区切り文字などファイル名に使えない文字はハイフンへ置換する。識別子は必須で、インシデント調査は `incident-<番号>`(例: `2026_09_29_203452_incident-123_domain-controller-persistence.html`)、エンティティ調査は `<種別>-<値>`(例: `2026_09_29_203452_user-alice-contoso-com_suspicious-signins.html`)、値のない横断ハントは `hunt-<対象>`(例: `2026_09_29_203452_hunt-users_risky-user-review.html`)を使用する。
 - **配色**: 白背景を基本とし、アクセントカラーは青・グレー系の落ち着いた色調でまとめる(例: 見出し `#1565c0` 系、背景アクセント `#37474f`/`#607d8b` 系)。警告色(赤・オレンジ等)は重大度バッジなど本当に注意を引きたい箇所に限定して使う。
 - **可視化**: SVGおよびD3.jsを使い、調査内容に応じて意味のある図を最低1つ含める(例: アラート/イベントのタイムライン、関連エンティティの言及回数を示す棒グラフ、攻撃チェーンの図解など)。装飾目的だけの図は不要。
 - **D3.jsの読み込み**: CDN(例: `<script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>`)から読み込む。レポートはHTMLファイル単体で渡されることが多いため、ローカルの `assets/` 配下のファイルには依存させない。
@@ -36,8 +36,14 @@
 - **事前チェックは会話の最初・間隔が空いた時・関連エラー発生時だけでよい**(毎回のクエリで確認し直さない): 該当時にのみ以下を行う。
   - モジュール/CLI: `Az.Accounts` / `Az.OperationalInsights` が未導入、または `Connect-AzAccount` 等のコマンドが見つからない場合は、確認を取らずその場で `Install-Module Az.Accounts, Az.OperationalInsights -Scope CurrentUser -Force` を実行(README.mdと同じ)。`az` CLIが必要な操作で不足していても同様にその場で導入する。
   - サインイン: `Get-AzContext` で確認し、未サインイン/空なら `Connect-AzAccount` を実行(テナント切替は `-TenantId <tenant-id>`)。トークンキャッシュはディスク保存のため通常は新規プロセスでも引き継がれる。
-- クエリの基本形:
+- クエリの基本形。**各PowerShellツール呼び出しは新規プロセスなので、直前の呼び出しで設定済みでも必ず同じコマンド内で `.env` を再読込する**:
   ```powershell
+  $env:AISOC_WORKSPACE_ID = ((Get-Content .env | Where-Object { $_ -match '^AISOC_WORKSPACE_ID=' } | Select-Object -First 1) -replace '^AISOC_WORKSPACE_ID=', '').Trim()
+  if ([string]::IsNullOrWhiteSpace($env:AISOC_WORKSPACE_ID)) { throw 'AISOC_WORKSPACE_ID is missing from .env' }
   Invoke-AzOperationalInsightsQuery -WorkspaceId $env:AISOC_WORKSPACE_ID -Query "<KQL>" -Timespan (New-TimeSpan -Hours <N>)
   ```
+- **KQL互換性とエラー切り分け**:
+  - KQLで型付き整数のゼロが必要な場合、`0L`は使用しない。このワークスペースのQuery APIではスカラー名として解釈されてSemanticErrorになるため、`tolong(0)`を使う。
+  - 複数の`let`、`union`、`join`を含む複合クエリがBadRequestになった場合、同じクエリを推測で微修正して繰り返さない。まず`-ErrorAction Stop`を付け、catch内で`$_.Exception.ToString()`を確認する。それでも原因が不明なら各データソース/`let`を単独実行し、成功する最小単位を確認してから再結合する。
+  - 端末横断ハントでは、難読化PowerShellや`rundll32.exe`の件数だけで不審端末と判定しない。DefenderやWindows保守処理でも大量発生するため、既知の正常コマンドを除外し、High/Mediumアラート、UEBA、具体的な攻撃手法など独立したシグナルと突合する。
 - セットアップ手順は [README.md](../README.md) を参照してください。

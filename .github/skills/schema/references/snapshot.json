@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "snapshotDate": "2026-09-29",
+  "workspaceIdSha256": "a6faa23cdfd3b578e67e213b456198ad5631c329bed5303ee9075f1de5a7f98f",
+  "tableEnumeration": {
+    "usageWindowDays": 30,
+    "searchWindowDays": 365,
+    "usageTableCount": 119,
+    "searchTableCount": 128,
+    "unionTableCount": 130
+  },
+  "schemaReferenceCount": 130
+}

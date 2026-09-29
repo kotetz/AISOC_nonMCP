@@ -34,7 +34,7 @@ context: fork
 
 「怪しいユーザーを探して」のように具体的なアカウント値がない場合は、直近7日間を既定として一次データから候補を抽出する。
 
-1. `AADRiskyUsers` / `AADUserRiskEvents` の高リスクまたは侵害確認済みユーザー、`SigninLogs` / `AADNonInteractiveUserSignInLogs` の異常な失敗・地理・IP・認証方式、`BehaviorAnalytics` の高いInvestigationPriority、`SecurityAlert` のAccountエンティティを横断する。利用可能なテーブル・列が不明な場合は `schema` Skillを参照する。
+1. `AADRiskyUsers` / `AADUserRiskEvents` の高リスクまたは侵害確認済みユーザー、`SigninLogs` / `AADNonInteractiveUserSignInLogs` の異常な失敗・地理・IP・認証方式、`BehaviorAnalytics` の高いInvestigationPriority、`SecurityAlert` のAccountエンティティを横断する。列と型は `../schema/references/<TableName>.md` を直接参照し、環境不一致・ファイル欠落・列エラー時だけ `schema` Skillの初期化・更新手順に従う。
 2. リスク状態、重大度、検知数、直近性を根拠に候補を順位付けする。単一のシグナルだけで侵害と断定しない。
 3. 上位候補(目安3件、候補が少なければ全件)を `identity` Skillへ委譲し、通常時との比較と関連アラートを深掘りする。
 4. `Reports/` 直下に `hunt-users` を含むファイル名で、候補ランキング、根拠、Identity所見、結論、推奨対応、実行した全KQLを含むHTMLレポートを作成する。

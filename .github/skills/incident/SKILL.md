@@ -58,4 +58,4 @@ context: fork
 
 ## 注意事項
 
-- テーブルの列がわからない場合は `schema` Skillの内容を参照する。
+- 使用するテーブルの列と型は `../schema/references/<TableName>.md` を直接参照する。Currentのリファレンスがあるテーブルへ通常調査で`getschema`を実行せず、環境不一致・ファイル欠落・列エラー時だけ `schema` Skillの初期化・更新手順に従う。
