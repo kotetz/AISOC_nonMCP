@@ -50,7 +50,7 @@ context: fork
 
 4. **記録**
 
-   [copilot-instructions.md](../../copilot-instructions.md) の「レポート出力」仕様に従い、`Reports/` 直下にインシデント番号を含むファイル名でHTMLレポートを作成する。最低限、次を含める:
+   [report.instructions.md](../../instructions/report.instructions.md) の様式に従い、`Reports/` 直下にインシデント番号を含むファイル名でHTMLレポートを作成する。最低限、次を含める:
    - インシデント概要(タイトル/重大度/ステータス/作成日時)
    - 各専門Skillの所見サマリ
    - 判定: True Positive / False Positive / Benign Positive / 調査継続

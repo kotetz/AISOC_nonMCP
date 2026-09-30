@@ -28,7 +28,7 @@ context: fork
 
 4. 記録:
 
-   [copilot-instructions.md](../../copilot-instructions.md) の「レポート出力」仕様に従い、`Reports/` 直下にエンティティ種別と値を含むファイル名でHTMLレポートを作成する。所見と結論(様子見/要エスカレーション/インシデント化を推奨、等)を記載する。
+   [report.instructions.md](../../instructions/report.instructions.md) の様式に従い、`Reports/` 直下にエンティティ種別と値を含むファイル名でHTMLレポートを作成する。所見と結論(様子見/要エスカレーション/インシデント化を推奨、等)を記載する。
 
 ## 注意事項
 

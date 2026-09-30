@@ -31,3 +31,4 @@ context: fork
 ## 注意事項
 
 - このワークスペースには `DeviceCustom*`(`DeviceCustomProcessEvents`等)という標準MDEスキーマにない独自テーブルも存在するため、通常の`Device*`テーブルにデータがなくても`DeviceCustom*`系を確認する。
+- 難読化PowerShellや`rundll32.exe`の実行件数だけで、不審なデバイスと判定しない。DefenderやWindowsの保守処理でも大量に発生するため、既知の正常なコマンドを除外し、High/Mediumアラート、UEBA、具体的な攻撃手法など独立したシグナルと突き合わせる。
